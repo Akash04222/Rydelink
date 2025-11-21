@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - RideLink</title>
+    <style>
+        body { font-family: Arial; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 50px auto; padding: 30px; background: white; border-radius: 10px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Join RideLink</h2>
+    <form action="/register" method="post">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="College Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="text" name="collegeId" placeholder="College ID" required>
+        <select name="role" required>
+            <option value="">Select Role</option>
+            <option value="driver">Driver (I have a vehicle)</option>
+            <option value="rider">Rider (I need a ride)</option>
+        </select>
+        <button type="submit">Create Account</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">
+        <a href="/login">Already have an account? Login</a>
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Dashboard - RideLink</title>
+    <style>
+        body { font-family: Arial; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Welcome to RideLink, <span th:text="${name}">User</span>!</h1>
+
+    <div class="card">
+        <h3>You are registered as: <span th:text="${role}">Role</span></h3>
+    </div>
+
+    <div th:if="${role == 'driver'}" class="card">
+        <h3>🚗 Driver Features</h3>
+        <p>• Offer Rides to Campus</p>
+        <p>• Manage Your Ride Schedule</p>
+        <p>• Earn by Sharing Rides</p>
+        <button class="btn">Offer a Ride</button>
+    </div>
+
+    <div th:if="${role == 'rider'}" class="card">
+        <h3>🎒 Rider Features</h3>
+        <p>• Search for Available Rides</p>
+        <p>• Book Seats</p>
+        <p>• Save Money on Commute</p>
+        <button class="btn">Find Rides</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/">Logout</a>
+    </div>
+</div>
+</body>
+</html>
