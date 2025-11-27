@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -497,6 +497,129 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-light);
     line-height: 1.6;
 }
+/* ===== Safety Section ===== */
+.safety {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.safety-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.safety-card {
+    background: var(--background);
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.safety-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.safety-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.safety-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+    transition: var(--transition);
+}
+
+.safety-card:hover .safety-icon {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+}
+
+.safety-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.safety-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.safety-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    background: var(--background);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.safety-feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.safety-feature i {
+    color: var(--accent);
+    font-size: 1.3rem;
+}
+
+/* Safety Section Animations */
+.safety-card {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.safety-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive Design for Safety Section */
+@media (max-width: 768px) {
+    .safety-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .safety-features {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
+    }
+
+    .safety-card {
+        padding: 2rem 1.5rem;
+    }
+}
+
 
 /* ===== CTA Section ===== */
 .cta {
@@ -865,6 +988,85 @@ h1, h2, h3, h4, h5, h6 {
     </div>
 </section>
 
+<!-- Safety Section -->
+<section class="safety" id="safety">
+    <div class="container">
+        <div class="section-header">
+            <h2>Your Safety is Our Priority</h2>
+            <p>Built-in features to ensure secure and trustworthy ride sharing</p>
+        </div>
+
+        <div class="safety-grid">
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>College Verification</h3>
+                <p>All users are verified through official college credentials and email addresses, ensuring a trusted community of students and staff.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Rating System</h3>
+                <p>Rate your ride partners after each journey. Maintain high standards with our transparent rating and feedback system.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Profile Verification</h3>
+                <p>Complete profiles with verified information help you make informed decisions about your ride partners.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>In-App Communication</h3>
+                <p>Communicate securely within the app before and during rides. No need to share personal contact information.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3>Route Tracking</h3>
+                <p>Share your ride details with friends or family. Planned routes and real-time updates for peace of mind.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h3>Community Reporting</h3>
+                <p>Quick and easy reporting system for any concerns. Our admin team actively monitors and responds to reports.</p>
+            </div>
+        </div>
+
+        <div class="safety-features">
+            <div class="safety-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>College ID Verification Required</span>
+            </div>
+            <div class="safety-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Two-Way Rating System</span>
+            </div>
+            <div class="safety-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Emergency Contact Integration</span>
+            </div>
+            <div class="safety-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>24/7 Support System</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- CTA Section -->
 <section class="cta">
     <div class="container">
@@ -994,6 +1196,32 @@ h1, h2, h3, h4, h5, h6 {
             }
         });
     });
+    // Add to your existing JavaScript in main.js
+
+// Safety section animation
+function initSafetyAnimations() {
+    const safetyCards = document.querySelectorAll('.safety-card');
+    const safetyObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    safetyCards.forEach(card => {
+        safetyObserver.observe(card);
+    });
+}
+
+// Call this function in your DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', () => {
+    // Your existing code...
+    initSafetyAnimations();
+    // Your existing code...
+});
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

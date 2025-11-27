@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer Ride - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #8b5cf6;
+            --secondary: #f59e0b;
+            --accent: #10b981;
+            --error: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background-alt);
+        }
+
+        /* ===== Navigation ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--background-alt);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--background-alt);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background-alt);
+            border-color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        /* ===== Create Ride Container ===== */
+        .create-ride-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 100px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .page-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* ===== Form Styles ===== */
+        .create-ride-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-label i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--background);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-helper {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* ===== Error Messages ===== */
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fecaca;
+        }
+
+        .error-message i {
+            margin-right: 0.5rem;
+        }
+
+        /* ===== Form Sections ===== */
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* ===== Form Actions ===== */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .create-ride-container {
+                padding: 1rem;
+                margin-top: 80px;
+            }
+
+            .create-ride-form {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <div class="nav-menu">
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/rides/create" class="nav-link active">Offer Ride</a>
+            <a href="/logout" class="btn btn-secondary">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Create Ride Container -->
+<div class="create-ride-container">
+    <div class="page-header">
+        <h1>Offer a Ride 🚗</h1>
+        <p>Help others commute and earn while you drive</p>
+    </div>
+
+    <form class="create-ride-form" action="/rides/create" method="post">
+        <!-- Error Message Display -->
+        <div th:if="${error}" class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Error:</strong> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Route Information -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="section-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h2 class="section-title">Route Information</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Start Location
+                    </label>
+                    <input type="text"
+                           name="startLocation"
+                           class="form-input"
+                           placeholder="e.g., Shivajinagar, Pune"
+                           th:value="${startLocation != null ? startLocation : ''}"
+                           required>
+                    <div class="form-helper">Where will you start your journey?</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-flag-checkered"></i>
+                        End Location
+                    </label>
+                    <input type="text"
+                           name="endLocation"
+                           class="form-input"
+                           placeholder="e.g., Indira College, Parandwadi"
+                           th:value="${endLocation != null ? endLocation : ''}"
+                           required>
+                    <div class="form-helper">Your final destination</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    Departure Date & Time
+                </label>
+                <input type="datetime-local"
+                       name="departureTime"
+                       class="form-input"
+                       th:value="${departureTime != null ? departureTime : ''}"
+                       required>
+                <div class="form-helper">When are you planning to leave?</div>
+            </div>
+        </div>
+
+        <!-- Ride Details -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="section-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h2 class="section-title">Ride Details</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-users"></i>
+                        Available Seats
+                    </label>
+                    <input type="number"
+                           name="availableSeats"
+                           class="form-input"
+                           min="1"
+                           max="10"
+                           th:value="${availableSeats != null ? availableSeats : '1'}"
+                           required>
+                    <div class="form-helper">How many passengers can you take?</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-rupee-sign"></i>
+                        Cost Per Seat
+                    </label>
+                    <input type="number"
+                           name="costPerSeat"
+                           class="form-input"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           th:value="${costPerSeat != null ? costPerSeat : ''}"
+                           required>
+                    <div class="form-helper">Cost per passenger (in ₹)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="section-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h2 class="section-title">Vehicle Information (Optional)</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-car-side"></i>
+                        Vehicle Type
+                    </label>
+                    <select name="vehicleType" class="form-select" th:value="${vehicleType != null ? vehicleType : ''}">
+                        <option value="">Select Vehicle Type</option>
+                        <option value="Hatchback">Hatchback</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Motorcycle">Motorcycle</option>
+                        <option value="Scooter">Scooter</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        Vehicle Number
+                    </label>
+                    <input type="text"
+                           name="vehicleNumber"
+                           class="form-input"
+                           placeholder="e.g., MH12AB1234"
+                           th:value="${vehicleNumber != null ? vehicleNumber : ''}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="section-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h2 class="section-title">Additional Information</h2>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sticky-note"></i>
+                    Notes for Riders
+                </label>
+                <textarea name="notes"
+                          class="form-textarea"
+                          placeholder="Any special instructions, pickup details, or information riders should know..."
+                          th:text="${notes != null ? notes : ''}"></textarea>
+                <div class="form-helper">Optional: Share any additional details about your ride</div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="/dashboard" class="btn btn-secondary btn-large">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-paper-plane"></i>
+                Create Ride Offer
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set minimum datetime to current time
+        const now = new Date();
+        const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        const datetimeInput = document.querySelector('input[type="datetime-local"]');
+
+        if (datetimeInput && !datetimeInput.value) {
+            datetimeInput.min = localDateTime;
+
+            // Set default departure time to next hour
+            const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+            const defaultDateTime = new Date(nextHour.getTime() - nextHour.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            datetimeInput.value = defaultDateTime;
+        }
+
+        // Form validation
+        const form = document.querySelector('.create-ride-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const startLocation = document.querySelector('input[name="startLocation"]').value.trim();
+                const endLocation = document.querySelector('input[name="endLocation"]').value.trim();
+                const costPerSeat = document.querySelector('input[name="costPerSeat"]').value;
+
+                if (!startLocation || !endLocation) {
+                    e.preventDefault();
+                    alert('Please fill in both start and end locations.');
+                    return;
+                }
+
+                if (parseFloat(costPerSeat) < 0) {
+                    e.preventDefault();
+                    alert('Cost per seat cannot be negative.');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Ride...';
+                submitBtn.disabled = true;
+            });
+        }
+    });
+</script>
+</body>
+</html>

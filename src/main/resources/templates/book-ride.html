@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ride - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --error: #ef4444;
+            --success: #10b981;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-alt);
+            color: var(--text-dark);
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .booking-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .booking-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ride-details {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .route {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .route-arrow {
+            color: var(--primary);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .detail-item i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        .driver-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--background-alt);
+            border-radius: var(--radius);
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .booking-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .seats-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .seat-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .seat-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .price-summary {
+            background: var(--background-alt);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-top: 2px solid var(--border);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: var(--error);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</nav>
+
+<!-- Booking Container -->
+<div class="container">
+    <!-- Error Message -->
+    <div th:if="${error}" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="booking-card">
+        <!-- Header -->
+        <div class="booking-header">
+            <h1>Book Your Ride</h1>
+            <p>Confirm your booking details</p>
+        </div>
+
+        <!-- Ride Details -->
+        <div class="ride-details">
+            <div class="route">
+                <span th:text="${ride.startLocation}">Start</span>
+                <i class="fas fa-arrow-right route-arrow"></i>
+                <span th:text="${ride.endLocation}">End</span>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    <span th:text="${#temporals.format(ride.departureTime, 'MMM dd, yyyy')}">Date</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-clock"></i>
+                    <span th:text="${#temporals.format(ride.departureTime, 'HH:mm')}">Time</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-users"></i>
+                    <span th:text="${ride.availableSeats + ' seats available'}">Seats</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-rupee-sign"></i>
+                    <span th:text="${'₹' + ride.costPerSeat + '/seat'}">Price</span>
+                </div>
+            </div>
+
+            <!-- Driver Info -->
+            <div class="driver-info">
+                <div class="driver-avatar" th:text="${ride.driver.name.substring(0, 1).toUpperCase()}">D</div>
+                <div>
+                    <h4 th:text="${ride.driver.name}">Driver Name</h4>
+                    <p>Verified College Student</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <form class="booking-form" action="/bookings/create" method="post">
+            <input type="hidden" name="rideId" th:value="${ride.id}">
+
+            <div class="form-group">
+                <label class="form-label">Number of Seats</label>
+                <div class="seats-selector" id="seatsSelector">
+                    <!-- JavaScript will generate seat buttons -->
+                </div>
+                <input type="hidden" name="seatsBooked" id="seatsBooked" value="1" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Additional Notes (Optional)</label>
+                <textarea name="notes" class="form-textarea" placeholder="Any special requests or information for the driver..." rows="3"></textarea>
+            </div>
+
+            <!-- Price Summary -->
+            <div class="price-summary">
+                <div class="price-row">
+                    <span>Price per seat:</span>
+                    <span th:text="${'₹' + ride.costPerSeat}">₹0</span>
+                </div>
+                <div class="price-row">
+                    <span>Seats booked:</span>
+                    <span id="seatsCount">1</span>
+                </div>
+                <div class="price-row total-price">
+                    <span>Total Amount:</span>
+                    <span id="totalAmount" th:text="${'₹' + ride.costPerSeat}">₹0</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-ticket-alt"></i>
+                    Confirm Booking
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ride = {
+            costPerSeat: [[${ride.costPerSeat}]],
+            availableSeats: [[${ride.availableSeats}]]
+        };
+
+        const seatsSelector = document.getElementById('seatsSelector');
+        const seatsBookedInput = document.getElementById('seatsBooked');
+        const seatsCountSpan = document.getElementById('seatsCount');
+        const totalAmountSpan = document.getElementById('totalAmount');
+
+        // Generate seat buttons
+        for (let i = 1; i <= Math.min(ride.availableSeats, 6); i++) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `seat-btn ${i === 1 ? 'selected' : ''}`;
+            button.textContent = i;
+            button.addEventListener('click', function() {
+                // Remove selected class from all buttons
+                document.querySelectorAll('.seat-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+
+                // Add selected class to clicked button
+                this.classList.add('selected');
+
+                // Update hidden input and display
+                seatsBookedInput.value = i;
+                seatsCountSpan.textContent = i;
+                updateTotalAmount(i);
+            });
+
+            seatsSelector.appendChild(button);
+        }
+
+        function updateTotalAmount(seats) {
+            const total = seats * ride.costPerSeat;
+            totalAmountSpan.textContent = '₹' + total.toFixed(2);
+        }
+
+        // Initialize
+        updateTotalAmount(1);
+    });
+</script>
+</body>
+</html>

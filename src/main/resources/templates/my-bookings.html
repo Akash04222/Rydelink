@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reuse your dashboard CSS styles */
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-alt);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--background-alt);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bookings-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .booking-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .route {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .detail-item i {
+            color: var(--primary);
+            width: 16px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <div class="nav-menu">
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/bookings/my-bookings" class="nav-link active">My Bookings</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="page-header">
+        <h1>My Bookings</h1>
+        <p>Manage your ride bookings and track your journeys</p>
+    </div>
+
+    <!-- Success Message -->
+    <div th:if="${success}" style="background: #d1fae5; color: #065f46; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${success}"></span>
+    </div>
+
+    <div class="bookings-grid">
+        <div th:each="booking : ${bookings}" class="booking-card">
+            <div class="booking-header">
+                <h3>Booking #<span th:text="${booking.id}">123</span></h3>
+                <span class="status-badge" th:classappend="${'status-' + booking.status.toLowerCase()}">
+                        <span th:text="${booking.status}">CONFIRMED</span>
+                    </span>
+            </div>
+
+            <div class="route" th:text="${booking.ride.startLocation + ' → ' + booking.ride.endLocation}">
+                Route
+            </div>
+
+            <div class="booking-details">
+                <div class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    <span th:text="${#temporals.format(booking.ride.departureTime, 'MMM dd, yyyy')}">Date</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-clock"></i>
+                    <span th:text="${#temporals.format(booking.ride.departureTime, 'HH:mm')}">Time</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-users"></i>
+                    <span th:text="${booking.seatsBooked + ' seats'}">Seats</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-rupee-sign"></i>
+                    <span th:text="${'₹' + booking.totalAmount}">Amount</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-user"></i>
+                    <span th:text="${booking.ride.driver.name}">Driver</span>
+                </div>
+            </div>
+
+            <div class="booking-actions">
+                <a th:href="@{/bookings/success?bookingId={id}(id=${booking.id})}" class="btn btn-primary">
+                    <i class="fas fa-eye"></i>
+                    View Details
+                </a>
+                <th:block th:if="${booking.status == 'CONFIRMED' or booking.status == 'PENDING'}">
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                    </form>
+                </th:block>
+            </div>
+        </div>
+
+        <div th:if="${bookings == null or bookings.empty}" class="empty-state">
+            <i class="fas fa-ticket-alt"></i>
+            <h3>No bookings yet</h3>
+            <p>Book your first ride to see it here!</p>
+            <a href="/dashboard" class="btn btn-primary" style="margin-top: 1rem;">
+                <i class="fas fa-search"></i>
+                Find Rides
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
