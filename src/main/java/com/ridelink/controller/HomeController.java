@@ -4,6 +4,7 @@ import com.ridelink.model.Ride;
 import com.ridelink.model.User;
 import com.ridelink.repository.RideRepository;
 import com.ridelink.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,6 @@ public class HomeController {
         return "register";
     }
 
-
     // Process registration
     @PostMapping("/register")
     public String registerUser(@RequestParam String name,
@@ -51,11 +51,12 @@ public class HomeController {
             return "register";
         }
 
-        // Create new user
+        // Create new user with PENDING status
         User user = new User(name, email, password, role, collegeId);
+        user.setAccountStatus("PENDING"); // All new accounts need approval
         userRepository.save(user);
 
-        model.addAttribute("message", "Registration successful! Please login.");
+        model.addAttribute("message", "Registration successful! Your account is pending admin approval.");
         return "login";
     }
 
@@ -65,25 +66,86 @@ public class HomeController {
         return "login";
     }
 
-    // Process login
+    // Process login - FIXED: Added admin redirect
     @PostMapping("/login")
     public String loginUser(@RequestParam String email,
                             @RequestParam String password,
                             HttpSession session,
                             Model model) {
-        User user = userRepository.findByEmail(email);
+        try {
+            System.out.println("=== LOGIN ATTEMPT ===");
+            System.out.println("Email: " + email);
 
-        if (user != null && user.getPassword().equals(password)) {
-            // Login successful
+            // Find user by email
+            User user = userRepository.findByEmail(email);
+            System.out.println("User found: " + (user != null ? "YES" : "NO"));
+
+            if (user == null) {
+                System.out.println("ERROR: User not found with email: " + email);
+                model.addAttribute("error", "Invalid email or password");
+                return "login";
+            }
+
+            System.out.println("User details:");
+            System.out.println("  - ID: " + user.getId());
+            System.out.println("  - Name: " + user.getName());
+            System.out.println("  - Role: " + user.getRole());
+            System.out.println("  - Status: " + user.getAccountStatus());
+            System.out.println("  - Password in DB: " + user.getPassword());
+            System.out.println("  - Password entered: " + password);
+
+            // Check password
+            if (!user.getPassword().equals(password)) {
+                System.out.println("ERROR: Password mismatch");
+                model.addAttribute("error", "Invalid email or password");
+                return "login";
+            }
+
+            // Check account status
+            String status = user.getAccountStatus();
+            System.out.println("Account status: " + status);
+
+            if (status == null) {
+                System.out.println("WARNING: Account status is null, setting to PENDING");
+                status = "PENDING";
+                user.setAccountStatus(status);
+                userRepository.save(user);
+            }
+
+            if ("REJECTED".equals(status)) {
+                System.out.println("ERROR: Account is REJECTED");
+                model.addAttribute("error", "Your account has been rejected. Please contact admin.");
+                return "login";
+            }
+
+            if ("PENDING".equals(status)) {
+                System.out.println("ERROR: Account is PENDING");
+                model.addAttribute("error", "Your account is pending approval. Please wait for admin approval.");
+                return "login";
+            }
+
+            // Store user in session
+            System.out.println("Setting user in session");
             session.setAttribute("user", user);
+
+            // Redirect based on role
+            System.out.println("User role: " + user.getRole());
+
+            if ("ADMIN".equals(user.getRole())) {
+                System.out.println("Redirecting to ADMIN dashboard");
+                return "redirect:/admin/dashboard";
+            }
+
+            System.out.println("Redirecting to regular dashboard");
             return "redirect:/dashboard";
-        } else {
-            // Login failed
-            model.addAttribute("error", "Invalid email or password");
+
+        } catch (Exception e) {
+            System.err.println("=== LOGIN EXCEPTION ===");
+            e.printStackTrace();
+            model.addAttribute("error", "Login error: " + e.getMessage());
             return "login";
         }
     }
-
     // Dashboard
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpSession session) {
@@ -96,10 +158,13 @@ public class HomeController {
             // Show driver's rides
             List<Ride> myRides = rideRepository.findByDriverId(user.getId());
             model.addAttribute("myRides", myRides);
-        } else {
+        } else if ("rider".equals(user.getRole())) {
             // Show available rides for riders
             List<Ride> availableRides = rideRepository.findByDepartureTimeAfter(LocalDateTime.now());
             model.addAttribute("availableRides", availableRides);
+        } else if ("ADMIN".equals(user.getRole())) {
+            // Admin dashboard - redirect to admin panel
+            return "redirect:/admin/dashboard";
         }
 
         return "dashboard";
@@ -119,7 +184,7 @@ public class HomeController {
         return "create-ride";
     }
 
-    // Process ride creation - REPLACE THIS METHOD
+    // Process ride creation
     @PostMapping("/rides/create")
     public String createRide(@RequestParam String startLocation,
                              @RequestParam String endLocation,
@@ -203,11 +268,10 @@ public class HomeController {
         }
         return "search-results";
     }
-
-    // Logout
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
+    public String logout(HttpServletRequest request) {
+        // Invalidate session
+        request.getSession().invalidate();
+        return "redirect:/login";
     }
 }

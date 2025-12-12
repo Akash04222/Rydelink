@@ -2,18 +2,13 @@ package com.ridelink.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rides")
 public class Ride {
 
-    public int getBookedSeats() {
-        return availableSeats; // This will be calculated from bookings
-    }
-
-    public boolean hasAvailableSeats(int requestedSeats) {
-        return availableSeats >= requestedSeats;
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +16,9 @@ public class Ride {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", nullable = false)
     private User driver;
+
+    @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Booking> bookings = new ArrayList<>();
 
     @Column(nullable = false)
     private String startLocation;
@@ -58,6 +56,22 @@ public class Ride {
         this.availableSeats = availableSeats;
         this.costPerSeat = costPerSeat;
     }
+    // UPDATE THESE METHODS
+    public int getBookedSeats() {
+        if (bookings == null) return 0;
+        return bookings.stream()
+                .filter(booking -> booking.getStatus() == Booking.BookingStatus.CONFIRMED)
+                .mapToInt(Booking::getSeatsBooked)
+                .sum();
+    }
+
+    public int getRemainingSeats() {
+        return availableSeats - getBookedSeats();
+    }
+
+    public boolean hasAvailableSeats(int requestedSeats) {
+        return getRemainingSeats() >= requestedSeats;
+    }
 
     // Getters and Setters for ALL fields
     public Long getId() { return id; }
@@ -65,6 +79,9 @@ public class Ride {
 
     public User getDriver() { return driver; }
     public void setDriver(User driver) { this.driver = driver; }
+
+    public List<Booking> getBookings() { return bookings; }
+    public void setBookings(List<Booking> bookings) { this.bookings = bookings; }
 
     public String getStartLocation() { return startLocation; }
     public void setStartLocation(String startLocation) { this.startLocation = startLocation; }

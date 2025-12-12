@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Bookings - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-alt);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .ride-info-card {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .ride-info-card h2 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .ride-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-item i {
+            color: var(--primary);
+            width: 16px;
+        }
+
+        .bookings-card {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .bookings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .bookings-header h2 {
+            color: var(--text-dark);
+        }
+
+        .booking-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .booking-item {
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background-alt);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .passenger-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .passenger-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .passenger-details h3 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .passenger-details p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+
+            .booking-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+
+            .bookings-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" style="position: fixed; top: 0; width: 100%; background: white; padding: 1rem 2rem; border-bottom: 1px solid var(--border); z-index: 1000;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <a href="/dashboard" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header">
+        <h1>Ride Bookings</h1>
+        <p>Manage passenger bookings for your ride</p>
+    </div>
+
+    <!-- Ride Information -->
+    <div class="ride-info-card">
+        <h2 th:text="${ride.startLocation + ' → ' + ride.endLocation}">Route</h2>
+        <div class="ride-details">
+            <div class="detail-item">
+                <i class="fas fa-calendar"></i>
+                <span th:text="${#temporals.format(ride.departureTime, 'MMMM dd, yyyy')}">Date</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock"></i>
+                <span th:text="${#temporals.format(ride.departureTime, 'HH:mm')}">Time</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-users"></i>
+                <span th:text="${ride.availableSeats + ' seats total'}">Seats</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-rupee-sign"></i>
+                <span th:text="${'₹' + ride.costPerSeat + '/seat'}">Price</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings List -->
+    <div class="bookings-card">
+        <div class="bookings-header">
+            <h2>Passenger Bookings</h2>
+            <span class="booking-count" th:text="${bookings.size() + ' bookings'}">0 bookings</span>
+        </div>
+
+        <div th:if="${bookings != null and !bookings.empty}" class="booking-list">
+            <div th:each="booking : ${bookings}" class="booking-item">
+                <div class="booking-header">
+                    <div class="passenger-info">
+                        <div class="passenger-avatar" th:text="${booking.rider.name.substring(0, 1).toUpperCase()}">P</div>
+                        <div class="passenger-details">
+                            <h3 th:text="${booking.rider.name}">Passenger Name</h3>
+                            <p th:text="${booking.rider.collegeId}">College ID</p>
+                        </div>
+                    </div>
+                    <span th:classappend="'status-badge ' +
+                            ${booking.status == T(com.ridelink.model.Booking.BookingStatus).CONFIRMED} ? 'status-confirmed' :
+                            ${booking.status == T(com.ridelink.model.Booking.BookingStatus).PENDING} ? 'status-pending' :
+                            'status-cancelled'"
+                          th:text="${booking.status}">Status</span>
+                </div>
+
+                <div class="booking-details">
+                    <div class="booking-detail">
+                        <span class="detail-label">Seats Booked</span>
+                        <span class="detail-value" th:text="${booking.seatsBooked}">1</span>
+                    </div>
+                    <div class="booking-detail">
+                        <span class="detail-label">Total Amount</span>
+                        <span class="detail-value" th:text="${'₹' + booking.totalAmount}">₹100</span>
+                    </div>
+                    <div class="booking-detail">
+                        <span class="detail-label">Booked On</span>
+                        <span class="detail-value" th:text="${#temporals.format(booking.bookingTime, 'MMM dd, HH:mm')}">Date</span>
+                    </div>
+                    <div class="booking-detail">
+                        <span class="detail-label">Contact</span>
+                        <span class="detail-value" th:text="${booking.rider.email}">email@example.com</span>
+                    </div>
+                </div>
+
+                <div th:if="${booking.notes}" class="booking-detail">
+                    <span class="detail-label">Passenger Notes</span>
+                    <span class="detail-value" th:text="${booking.notes}">Notes</span>
+                </div>
+
+                <div class="booking-actions">
+                    <a th:href="@{mailto:{email}(email=${booking.rider.email})}" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i>
+                        Contact
+                    </a>
+                    <button class="btn btn-secondary" onclick="showPassengerDetails([[${booking.rider.id}]])">
+                        <i class="fas fa-info-circle"></i>
+                        Details
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${bookings == null or bookings.empty}" class="empty-state">
+            <i class="fas fa-users-slash"></i>
+            <h3>No Bookings Yet</h3>
+            <p>Your ride doesn't have any bookings at the moment.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                <i class="fas fa-lightbulb"></i>
+                Share your ride link to get more bookings!
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showPassengerDetails(riderId) {
+        alert('Passenger details feature will be implemented soon!\nRider ID: ' + riderId);
+    }
+
+    // Add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookingItems = document.querySelectorAll('.booking-item');
+        bookingItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.closest('.booking-actions')) {
+                    this.classList.toggle('expanded');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

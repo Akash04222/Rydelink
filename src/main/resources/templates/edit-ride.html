@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Ride - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --error: #ef4444;
+            --success: #10b981;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-alt);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .form-card {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--background);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background-alt);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .delete-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .delete-section p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" style="position: fixed; top: 0; width: 100%; background: white; padding: 1rem 2rem; border-bottom: 1px solid var(--border); z-index: 1000;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <a href="/dashboard" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header">
+        <h1>Edit Your Ride</h1>
+        <p>Update your ride details and help others commute</p>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/ride/update/{id}(id=${ride.id})}" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="startLocation">Pickup Location *</label>
+                    <input type="text" id="startLocation" name="startLocation"
+                           th:value="${ride.startLocation}" class="form-input"
+                           placeholder="e.g., ICEM College" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="endLocation">Dropoff Location *</label>
+                    <input type="text" id="endLocation" name="endLocation"
+                           th:value="${ride.endLocation}" class="form-input"
+                           placeholder="e.g., Wakad" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="departureTime">Departure Time *</label>
+                    <input type="datetime-local" id="departureTime" name="departureTime"
+                           th:value="${#temporals.format(ride.departureTime, 'yyyy-MM-dd\\'T\\'HH:mm')}"
+                           class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="availableSeats">Available Seats *</label>
+                    <input type="number" id="availableSeats" name="availableSeats"
+                           th:value="${ride.availableSeats}" class="form-input"
+                           min="1" max="10" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="costPerSeat">Price per Seat (₹) *</label>
+                    <input type="number" id="costPerSeat" name="costPerSeat"
+                           th:value="${ride.costPerSeat}" class="form-input"
+                           min="1" step="0.5" placeholder="100.0" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="vehicleType">Vehicle Type</label>
+                    <select id="vehicleType" name="vehicleType" class="form-select">
+                        <option value="">Select Vehicle Type</option>
+                        <option value="Motorcycle" th:selected="${ride.vehicleType == 'Motorcycle'}">Motorcycle</option>
+                        <option value="Car" th:selected="${ride.vehicleType == 'Car'}">Car</option>
+                        <option value="SUV" th:selected="${ride.vehicleType == 'SUV'}">SUV</option>
+                        <option value="Auto" th:selected="${ride.vehicleType == 'Auto'}">Auto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="vehicleNumber">Vehicle Number</label>
+                    <input type="text" id="vehicleNumber" name="vehicleNumber"
+                           th:value="${ride.vehicleNumber}" class="form-input"
+                           placeholder="e.g., MH12AB1234">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="notes">Additional Notes</label>
+                <textarea id="notes" name="notes" class="form-textarea"
+                          placeholder="Any additional information for riders...">
+                        <span th:text="${ride.notes}"></span>
+                    </textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Update Ride
+                </button>
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+        <!-- Delete Ride Section -->
+        <div class="delete-section">
+            <p><strong>Danger Zone</strong> - This action cannot be undone</p>
+            <form th:action="@{/ride/delete/{id}(id=${ride.id})}" method="post"
+                  onsubmit="return confirm('Are you sure you want to delete this ride? This action cannot be undone.');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                    Delete This Ride
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set minimum datetime to current time
+    const now = new Date();
+    const localDateTime = now.toISOString().slice(0, 16);
+    document.getElementById('departureTime').min = localDateTime;
+
+    // Add confirmation for delete
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForm = document.querySelector('.delete-section form');
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function(e) {
+                if (!confirm('⚠️ Are you absolutely sure? This will permanently delete your ride and any associated bookings.')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/bookings")
@@ -99,7 +100,8 @@ public class BookingController {
 
             // For now, auto-confirm the booking
             // In real scenario, driver would confirm
-            booking.setStatus("CONFIRMED");
+            booking.setStatus(Booking.BookingStatus.CONFIRMED);
+
 
             // Update available seats
             ride.setAvailableSeats(ride.getAvailableSeats() - seatsBooked);
@@ -151,7 +153,6 @@ public class BookingController {
         model.addAttribute("bookings", bookings);
         return "my-bookings";
     }
-
     // Cancel booking
     @PostMapping("/cancel/{bookingId}")
     public String cancelBooking(@PathVariable Long bookingId,
@@ -178,7 +179,8 @@ public class BookingController {
         Ride ride = booking.getRide();
         ride.setAvailableSeats(ride.getAvailableSeats() + booking.getSeatsBooked());
 
-        booking.setStatus("CANCELLED");
+        booking.setStatus(Booking.BookingStatus.CANCELLED);
+
 
         bookingRepository.save(booking);
         rideRepository.save(ride);

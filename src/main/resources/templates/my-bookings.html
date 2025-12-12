@@ -230,6 +230,14 @@
         <span th:text="${success}"></span>
     </div>
 
+    <div style="background: #e9ecef; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-family: monospace; font-size: 0.9rem;">
+        <strong>Debug Info:</strong><br>
+        User: <span th:text="${user.name}">N/A</span> |
+        User ID: <span th:text="${user.id}">N/A</span> |
+        Role: <span th:text="${user.role}">N/A</span> |
+        Bookings Count: <span th:text="${bookings != null ? bookings.size() : 'NULL'}">0</span>
+    </div>
+
     <div class="bookings-grid">
         <div th:each="booking : ${bookings}" class="booking-card">
             <div class="booking-header">

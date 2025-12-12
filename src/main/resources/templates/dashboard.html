@@ -93,6 +93,17 @@
             transform: translateY(-2px);
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+
         .btn-logout {
             background: var(--error);
             color: white;
@@ -455,26 +466,24 @@
             color: var(--text-dark);
         }
 
-        /* ===== Create Ride Form ===== */
-        .create-ride-form {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            max-width: 600px;
-            margin: 0 auto;
+        /* ===== Success/Error Messages ===== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border: 1px solid transparent;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
         }
 
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
         }
 
         /* ===== Responsive Design ===== */
@@ -512,6 +521,10 @@
                 flex-direction: column;
                 gap: 1rem;
                 align-items: flex-start;
+            }
+
+            .ride-actions {
+                flex-direction: column;
             }
         }
 
@@ -552,7 +565,7 @@
         <div class="nav-menu">
             <a href="/dashboard" class="nav-link active">Dashboard</a>
             <a th:if="${user.role == 'driver'}" href="/rides/create" class="nav-link">Offer Ride</a>
-            <a th:if="${user.role == 'rider'}" href="/rides/search" class="nav-link">Find Rides</a>
+            <a th:if="${user.role == 'rider'}" href="/bookings/my-bookings" class="nav-link">My Bookings</a>
             <a href="/logout" class="btn btn-logout">Logout</a>
         </div>
     </div>
@@ -560,6 +573,23 @@
 
 <!-- Dashboard Content -->
 <div class="dashboard-container">
+    <!-- Success/Error Messages -->
+    <div th:if="${param.success}" class="alert alert-success fade-in">
+        <i class="fas fa-check-circle"></i>
+        <span th:if="${param.success == 'ride_created'}">Ride created successfully!</span>
+        <span th:if="${param.success == 'updateSuccess'}">Ride updated successfully!</span>
+        <span th:if="${param.success == 'deleteSuccess'}">Ride deleted successfully!</span>
+    </div>
+
+    <div th:if="${param.error}" class="alert alert-error fade-in">
+        <i class="fas fa-exclamation-circle"></i>
+        <span th:if="${param.error == 'unauthorized'}">You are not authorized to perform this action.</span>
+        <span th:if="${param.error == 'ride_not_found'}">Ride not found.</span>
+        <span th:if="${param.error == 'server_error'}">Server error occurred. Please try again.</span>
+        <span th:if="${param.updateError}">Update failed: <span th:text="${param.updateError}"></span></span>
+        <span th:if="${param.deleteError}">Delete failed: <span th:text="${param.deleteError}"></span></span>
+    </div>
+
     <!-- Dashboard Header -->
     <div class="dashboard-header fade-in">
         <h1>Welcome back, <span th:text="${user.name}">User</span>! 👋</h1>
@@ -594,7 +624,7 @@
             <div class="stat-icon">
                 <i class="fas fa-star"></i>
             </div>
-            <div class="stat-number">4.8</div>
+            <div class="stat-number" th:text="${user.averageRating != null ? user.averageRating : '0.0'}">0.0</div>
             <div class="stat-label">Your Rating</div>
         </div>
         <div class="stat-card">
@@ -628,8 +658,8 @@
                     <div class="ride-header">
                         <h3 th:text="${ride.startLocation + ' → ' + ride.endLocation}">Route</h3>
                         <span class="ride-date" th:text="${#temporals.format(ride.departureTime, 'MMM dd, HH:mm')}">
-                                Date
-                            </span>
+                            Date
+                        </span>
                     </div>
 
                     <div class="ride-route">
@@ -656,15 +686,13 @@
                         </div>
                     </div>
 
+                    <!-- Edit and View Bookings Buttons -->
                     <div class="ride-actions">
-                        <button class="btn btn-primary btn-small">
-                            <i class="fas fa-edit"></i>
-                            Edit
-                        </button>
-                        <button class="btn btn-secondary btn-small">
+
+                        <a th:href="@{/ride/{id}/bookings(id=${ride.id})}" class="btn btn-secondary btn-small">
                             <i class="fas fa-eye"></i>
                             View Bookings
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -725,15 +753,21 @@
                     <div class="ride-header">
                         <h3 th:text="${ride.startLocation + ' → ' + ride.endLocation}">Route</h3>
                         <span class="ride-date" th:text="${#temporals.format(ride.departureTime, 'MMM dd, HH:mm')}">
-                                Date
-                            </span>
+                            Date
+                        </span>
                     </div>
 
                     <div class="driver-info">
                         <div class="driver-avatar" th:text="${ride.driver.name.substring(0, 1).toUpperCase()}">D</div>
                         <div class="driver-details">
                             <h4 th:text="${ride.driver.name}">Driver Name</h4>
-                            <p>Verified College Student</p>
+                            <p>
+                                <span th:if="${ride.driver.averageRating > 0}">
+                                    <i class="fas fa-star" style="color: var(--secondary);"></i>
+                                    <span th:text="${ride.driver.averageRating}">0.0</span> •
+                                </span>
+                                Verified College Student
+                            </p>
                         </div>
                     </div>
 
@@ -751,20 +785,20 @@
                             <span th:text="${ride.vehicleType != null ? ride.vehicleType : 'Car'}">Vehicle</span>
                         </div>
                         <div class="detail">
-                            <i class="fas fa-star"></i>
-                            <span>4.8 ★</span>
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(ride.departureTime, 'HH:mm')}">Time</span>
                         </div>
                     </div>
 
                     <div class="ride-actions">
-                        <a th:href="@{/bookings/create/{rideId}(rideId=${ride.id})}" class="btn btn-primary btn-small">
+                        <a th:href="@{/bookings/create/{rideId}(rideId=${ride.id})}" class="btn btn-success btn-small">
                             <i class="fas fa-ticket-alt"></i>
                             Book Now
                         </a>
-                        <button class="btn btn-secondary btn-small" onclick="viewRideDetails([[${ride.id}]])">
-                            <i class="fas fa-info-circle"></i>
-                            Details
-                        </button>
+                        <a th:href="@{/rate/driver/{id}(id=${ride.driver.id})}" class="btn btn-secondary btn-small">
+                            <i class="fas fa-star"></i>
+                            Rate Driver
+                        </a>
                     </div>
                 </div>
             </div>
@@ -799,6 +833,16 @@
             if (!input.value) {
                 input.value = today;
             }
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
         });
     });
 

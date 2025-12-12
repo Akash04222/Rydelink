@@ -27,15 +27,19 @@ public class Booking {
     @Column(nullable = false)
     private LocalDateTime bookingTime;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status; // PENDING, CONFIRMED, CANCELLED
+    private BookingStatus status;
 
     private String notes;
+    public enum BookingStatus {
+        PENDING, CONFIRMED, CANCELLED, COMPLETED
+    }
 
     // Default constructor
     public Booking() {
         this.bookingTime = LocalDateTime.now();
-        this.status = "PENDING";
+        this.status = BookingStatus.PENDING;
     }
 
     // Parameterized constructor
@@ -71,8 +75,8 @@ public class Booking {
     public LocalDateTime getBookingTime() { return bookingTime; }
     public void setBookingTime(LocalDateTime bookingTime) { this.bookingTime = bookingTime; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public BookingStatus getStatus() { return status; }
+    public void setStatus(BookingStatus status) { this.status = status; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

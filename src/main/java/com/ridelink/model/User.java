@@ -8,12 +8,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String email;
     private String password;
     private String role;
     private String collegeId;
+    private Double averageRating = 0.0;
+    private Integer totalRatings = 0;
+
+    //THIS FIELD is for admin approval system
+    private String accountStatus = "PENDING"; // PENDING, APPROVED, REJECTED
 
     // Constructors
     public User() {}
@@ -24,6 +28,7 @@ public class User {
         this.password = password;
         this.role = role;
         this.collegeId = collegeId;
+        this.accountStatus = "PENDING"; // Default status for new users
     }
 
     // Getters and Setters
@@ -44,4 +49,14 @@ public class User {
 
     public String getCollegeId() { return collegeId; }
     public void setCollegeId(String collegeId) { this.collegeId = collegeId; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+
+    public Integer getTotalRatings() { return totalRatings; }
+    public void setTotalRatings(Integer totalRatings) { this.totalRatings = totalRatings; }
+
+    // ADD GETTER AND SETTER FOR ACCOUNT STATUS
+    public String getAccountStatus() { return accountStatus; }
+    public void setAccountStatus(String accountStatus) { this.accountStatus = accountStatus; }
 }

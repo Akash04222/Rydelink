@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Driver - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-alt);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .rating-card {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .driver-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--background-alt);
+            border-radius: var(--radius);
+        }
+
+        .driver-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .driver-details h3 {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 1.3rem;
+        }
+
+        .driver-details p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .star-rating {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .star-rating h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .star {
+            font-size: 3rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star:hover,
+        .star.active {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .rating-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--background);
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background-alt);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .rating-hint {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+
+            .stars {
+                gap: 0.25rem;
+            }
+
+            .star {
+                font-size: 2.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" style="position: fixed; top: 0; width: 100%; background: white; padding: 1rem 2rem; border-bottom: 1px solid var(--border); z-index: 1000;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <a href="/dashboard" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink</span>
+        </a>
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header">
+        <h1>Rate Your Driver</h1>
+        <p>Share your experience to help the community</p>
+    </div>
+
+    <div class="rating-card">
+        <div class="driver-info">
+            <div class="driver-avatar" th:text="${driver.name.substring(0, 1).toUpperCase()}">D</div>
+            <div class="driver-details">
+                <h3 th:text="${driver.name}">Driver Name</h3>
+                <p>RideLink Driver</p>
+            </div>
+        </div>
+
+        <form th:action="@{/rate/driver/{id}(id=${driver.id})}" method="post">
+            <!-- Star Rating -->
+            <div class="star-rating">
+                <h3>How was your ride?</h3>
+                <div class="stars" id="starContainer">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <div class="rating-text" id="ratingText">Tap to rate</div>
+                <input type="hidden" id="rating" name="rating" value="" required>
+            </div>
+
+            <!-- Comment -->
+            <div class="form-group">
+                <label class="form-label" for="comment">
+                    Your Review (Optional)
+                    <span style="color: var(--text-light); font-weight: normal; font-size: 0.9rem;">
+                            - What made this ride great?
+                        </span>
+                </label>
+                <textarea id="comment" name="comment" class="form-textarea"
+                          placeholder="Share details about your experience... Was the driver punctual? How was the conversation? Any suggestions for improvement?"
+                          maxlength="500"></textarea>
+                <div class="char-count">
+                    <span id="charCount">0</span>/500 characters
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                    <i class="fas fa-star"></i>
+                    Submit Rating
+                </button>
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+        <div class="rating-hint">
+            <i class="fas fa-info-circle"></i>
+            Your rating helps maintain a trustworthy community
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedRating = 0;
+ const ratingTexts = {
+     1: "Poor - Uncomfortable ride",
+     2: "Fair - Could be better",
+     3: "Good - Met expectations",
+     4: "Very Good - Enjoyable ride",
+     5: "Excellent - Outstanding experience"
+ };
+
+ // Star rating functionality
+ document.querySelectorAll('.star').forEach(star => {
+     star.addEventListener('click', function() {
+         selectedRating = parseInt(this.getAttribute('data-rating'));
+
+         // Update hidden input
+         document.getElementById('rating').value = selectedRating;
+
+         // Update all stars
+         document.querySelectorAll('.star').forEach(s => {
+             const starRating = parseInt(s.getAttribute('data-rating'));
+             if (starRating <= selectedRating) {
+                 s.classList.add('active');
+             } else {
+                 s.classList.remove('active');
+             }
+         });
+
+         // Update rating text
+         document.getElementById('ratingText').textContent = ratingTexts[selectedRating];
+
+         // Enable submit button
+         document.getElementById('submitBtn').disabled = false;
+     });
+
+     // Hover effects
+     star.addEventListener('mouseover', function() {
+         const hoverRating = parseInt(this.getAttribute('data-rating'));
+         document.querySelectorAll('.star').forEach(s => {
+             const starRating = parseInt(s.getAttribute('data-rating'));
+             if (starRating <= hoverRating) {
+                 s.style.color = '#f59e0b';
+             }
+         });
+     });
+
+     star.addEventListener('mouseout', function() {
+         document.querySelectorAll('.star').forEach(s => {
+             const starRating = parseInt(s.getAttribute('data-rating'));
+             if (starRating <= selectedRating) {
+                 s.style.color = '#f59e0b';
+             } else {
+                 s.style.color = '#ddd';
+             }
+         });
+     });
+ });
+
+ // Character counter for comment
+ document.getElementById('comment').addEventListener('input', function() {
+     const length = this.value.length;
+     document.getElementById('charCount').textContent = length;
+
+     if (length > 500) {
+         this.value = this.value.substring(0, 500);
+         document.getElementById('charCount').textContent = 500;
+     }
+ });
+
+ // Form validation
+ document.querySelector('form').addEventListener('submit', function(e) {
+     if (selectedRating === 0) {
+         e.preventDefault();
+         alert('Please select a rating by clicking on the stars.');
+         return false;
+     }
+
+     // Optional: Add confirmation
+     const confirmSubmit = confirm(`Submit ${selectedRating} star rating?`);
+     if (!confirmSubmit) {
+         e.preventDefault();
+         return false;
+     }
+
+     return true;
+ });
+</script>
+</body>
+</html>

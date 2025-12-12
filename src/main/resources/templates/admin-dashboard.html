@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - RideLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --background: #ffffff;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-header h2 {
+            color: var(--text-dark);
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #f8fafc;
+        }
+
+        .user-info h4 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .user-info p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: transparent; color: var(--text-dark); border-color: var(--border); }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; color: var(--border); }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; margin-top: 70px; }
+            .user-item { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .action-buttons { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav style="position: fixed; top: 0; width: 100%; background: white; padding: 1rem 2rem; border-bottom: 1px solid var(--border); z-index: 1000;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <a href="/admin/dashboard" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">
+            <i class="fas fa-car-side"></i>
+            <span>RideLink Admin</span>
+        </a>
+        <div>
+            <a href="/admin/dashboard" class="btn btn-primary">Dashboard</a>
+            <a href="/admin/rides" class="btn btn-secondary">All Rides</a>
+            <a href="/logout" class="btn" style="background: var(--error); color: white;">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage RideLink platform and user accounts</p>
+        <div class="admin-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Administrator</span>
+        </div>
+    </div>
+
+    <!-- Success Messages -->
+    <div th:if="${param.success}" style="background: #d1fae5; color: #065f46; padding: 1rem; border-radius: var(--radius); margin-bottom: 2rem;">
+        <i class="fas fa-check-circle"></i>
+        <span th:if="${param.success == 'user_approved'}">User account approved successfully!</span>
+        <span th:if="${param.success == 'user_rejected'}">User account rejected successfully!</span>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" th:text="${allUsers != null ? allUsers.size() : '0'}">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${pendingUsers != null ? pendingUsers.size() : '0'}">0</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${allRides != null ? allRides.size() : '0'}">0</div>
+            <div class="stat-label">Total Rides</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${allUsers != null ? allUsers.stream().filter(u -> 'driver'.equals(u.getRole())).count() : '0'}">0</div>
+            <div class="stat-label">Drivers</div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Pending Account Approvals</h2>
+            <span class="stat-label" th:text="${pendingUsers != null ? pendingUsers.size() + ' pending' : '0 pending'}"></span>
+        </div>
+
+        <div th:if="${pendingUsers != null and !pendingUsers.empty}" class="user-list">
+            <div th:each="user : ${pendingUsers}" class="user-item">
+                <div class="user-info">
+                    <h4 th:text="${user.name}">User Name</h4>
+                    <p th:text="${user.email}">user@example.com</p>
+                    <p>Role: <span th:text="${user.role}" style="text-transform: capitalize;"></span> • College ID: <span th:text="${user.collegeId}">N/A</span></p>
+                </div>
+                <div class="action-buttons">
+                    <span class="status-badge status-pending">Pending Approval</span>
+                    <form th:action="@{/admin/approve-user/{id}(id=${user.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i>
+                            Approve
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/reject-user/{id}(id=${user.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times"></i>
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${pendingUsers == null or pendingUsers.empty}" class="empty-state">
+            <i class="fas fa-users"></i>
+            <h3>No Pending Approvals</h3>
+            <p>All user accounts are approved.</p>
+        </div>
+    </div>
+
+    <!-- Recent Rides Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Recent Rides</h2>
+            <a href="/admin/rides" class="btn btn-primary">View All Rides</a>
+        </div>
+
+        <div th:if="${allRides != null and !allRides.empty}" class="user-list">
+            <div th:each="ride : ${allRides.subList(0, Math.min(allRides.size(), 5))}" class="user-item">
+                <div class="user-info">
+                    <h4 th:text="${ride.startLocation + ' → ' + ride.endLocation}">Route</h4>
+                    <p th:text="${'Driver: ' + ride.driver.name}">Driver Name</p>
+                    <p th:text="${'Departure: ' + #temporals.format(ride.departureTime, 'MMM dd, HH:mm')}">Date</p>
+                </div>
+                <div class="action-buttons">
+                    <span th:text="${ride.availableSeats + ' seats'}" class="stat-label"></span>
+                    <span th:text="${'₹' + ride.costPerSeat}" class="stat-label"></span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${allRides == null or allRides.empty}" class="empty-state">
+            <i class="fas fa-car"></i>
+            <h3>No Rides Yet</h3>
+            <p>No rides have been created on the platform.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
