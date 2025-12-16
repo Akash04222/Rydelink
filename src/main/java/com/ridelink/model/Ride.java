@@ -36,6 +36,7 @@ public class Ride {
     private String vehicleType;
     private String vehicleNumber;
     private String notes;
+    private String status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -109,4 +110,13 @@ public class Ride {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }

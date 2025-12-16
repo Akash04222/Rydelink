@@ -303,10 +303,10 @@
         </div>
 
         <div th:if="${allRides != null and !allRides.empty}" class="user-list">
-            <div th:each="ride : ${allRides.subList(0, Math.min(allRides.size(), 5))}" class="user-item">
+            <div th:each="ride, iterStat : ${allRides}" th:if="${iterStat.index < 5}" class="user-item">
                 <div class="user-info">
                     <h4 th:text="${ride.startLocation + ' → ' + ride.endLocation}">Route</h4>
-                    <p th:text="${'Driver: ' + ride.driver.name}">Driver Name</p>
+                    <p th:text="${ride.driver != null ? 'Driver: ' + ride.driver.name : 'Driver: Not assigned'}">Driver Name</p>
                     <p th:text="${'Departure: ' + #temporals.format(ride.departureTime, 'MMM dd, HH:mm')}">Date</p>
                 </div>
                 <div class="action-buttons">

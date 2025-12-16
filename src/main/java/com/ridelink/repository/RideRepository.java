@@ -28,4 +28,9 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     // Find rides with available seats
     List<Ride> findByAvailableSeatsGreaterThan(int seats);
+
+    List<Ride> findByStatus(String status);
+
+
+    List<Ride> findByDriverNameContainingIgnoreCase(String driver);
 }

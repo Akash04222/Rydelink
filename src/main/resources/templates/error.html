@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .error-box {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+        pre {
+            background: #343a40;
+            color: #fff;
+            padding: 15px;
+            overflow: auto;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<h1>🚨 Error Occurred</h1>
+
+<div class="error-box">
+    <h3>Error Details:</h3>
+    <p><strong>Status:</strong> <span th:text="${status}">500</span></p>
+    <p><strong>Error:</strong> <span th:text="${error}">Internal Server Error</span></p>
+    <p><strong>Message:</strong> <span th:text="${message}">No message available</span></p>
+    <p><strong>Path:</strong> <span th:text="${path}">Unknown</span></p>
+    <p><strong>Timestamp:</strong> <span th:text="${timestamp}">Unknown</span></p>
+</div>
+
+<div th:if="${exception != null}">
+    <h3>Exception Details:</h3>
+    <pre th:text="${exception}">No exception details</pre>
+</div>
+
+<div th:if="${trace != null}">
+    <h3>Stack Trace:</h3>
+    <pre th:text="${trace}">No stack trace</pre>
+</div>
+
+<div style="margin-top: 20px;">
+    <a href="/login" class="btn">Go to Login</a>
+    <a href="/" class="btn" style="background: #6c757d;">Go Home</a>
+</div>
+</body>
+</html>
